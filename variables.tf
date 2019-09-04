@@ -10,14 +10,63 @@ variable name {
 
 variable tags {}
 
+#-------------------------------------
 # Networking
+#-------------------------------------
 
 variable vpc_id {
   description = "VPC where everything must be!"
 }
 
+variable private_subnet_ids {
+  description = "Private subnets within which to deploy internal resources."
+  type        = "list"
+}
 
+variable public_subnet_ids {
+  description = "Public subnets within which to deploy internet facing resources."
+  type        = "list"
+}
+
+#--------------------------------------
+# ECS - APP
+#--------------------------------------
+variable container_port {
+  description = ""
+  default     = 8000
+}
+
+variable http_port {
+  description = "HTTP"
+  default     = 80
+}
+
+variable https_port {
+  description = "HTTPS"
+  default     = 443
+}
+
+variable certificate_arn {
+  description = "SSL certificate"
+  default     = ""
+}
+
+variable cpu {
+  description = "CPU quota allocated to container."
+  default     = 512
+}
+
+variable memory {
+  description = "Memory allocated to container."
+  default     = 1024
+}
+
+variable log_prefix {
+  default = "/"
+}
+#--------------------------------------
 # RDS
+#--------------------------------------
 
 variable "db_name" {
   description = "Database name."

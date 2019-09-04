@@ -7,7 +7,7 @@
 #
 
 AWS_DEFAULT_REGION ?= ap-southeast-2
-AWS_VAULT_PROFILE ?= kb
+AWS_VAULT_PROFILE ?= kb-superuser
 TF_PROJECT ?= examples
 TIMEOUT ?= 3600s
 
@@ -29,7 +29,6 @@ apply: plan
 
 clean:
 	echo "Cleaning up old environment..."
-	rm -rf $(TF_PROJECT)/terraform.tfstate $(TF_PROJECT)/terraform.tfstate.backup
 	rm -rf $(TF_PROJECT)/.terraform
 	rm -rf .terraform
 	rm -rf terraform.tfplan
