@@ -83,5 +83,9 @@ variable db_password {}
 
 variable db_instance_type {
   description = "Type of database server."
-  default     = "db.t3.small"
+  default     = "db.t3.medium"
+}
+
+variable aurora_engine {
+  default = "aurora-postgresql"
 }

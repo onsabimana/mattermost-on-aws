@@ -290,6 +290,16 @@ resource aws_security_group_rule "rds_ingress" {
   source_security_group_id = "${aws_security_group.app.id}"
 }
 
+resource aws_security_group_rule "rds_egress" {
+  description       = "Allow traffic from RDS to the rest of the world."
+  type              = "egress"
+  from_port         = 0
+  to_port           = 0
+  protocol          = "-1"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = "${aws_security_group.rds.id}"
+}
+
 resource aws_db_subnet_group "rds" {
   name        = "${var.name}-db-subnet"
   description = "Subnets to launch RDS database into"
@@ -299,15 +309,16 @@ resource aws_db_subnet_group "rds" {
 }
 
 resource aws_rds_cluster "rds" {
-  cluster_identifier   = "${var.name}-db"
-  engine               = "aurora-postgresql"
-  database_name        = "${var.db_name}"
-  master_username      = "${var.db_username}"
-  master_password      = "${var.db_password}"
-  storage_encrypted    = true
-  skip_final_snapshot  = true
-  port                 = "${var.db_port}"
-  db_subnet_group_name = "${aws_db_subnet_group.rds.name}"
+  cluster_identifier     = "${var.name}-db"
+  engine                 = "${var.aurora_engine}"
+  database_name          = "${var.db_name}"
+  master_username        = "${var.db_username}"
+  master_password        = "${var.db_password}"
+  storage_encrypted      = true
+  skip_final_snapshot    = true
+  port                   = "${var.db_port}"
+  db_subnet_group_name   = "${aws_db_subnet_group.rds.name}"
+  vpc_security_group_ids = ["${aws_security_group.rds.id}"]
 
   lifecycle {
     create_before_destroy = true
@@ -315,4 +326,20 @@ resource aws_rds_cluster "rds" {
   }
 
   tags = "${var.tags}"
+}
+
+resource "aws_rds_cluster_instance" "rds" {
+  cluster_identifier         = "${aws_rds_cluster.rds.id}"
+  identifier                 = "${var.name}-db"
+  engine                     = "${var.aurora_engine}"
+  instance_class             = "${var.db_instance_type}"
+  publicly_accessible        = false
+  db_subnet_group_name       = "${aws_db_subnet_group.rds.name}"
+  auto_minor_version_upgrade = true
+
+  tags = "${var.tags}"
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
