@@ -8,14 +8,8 @@
 
 AWS_DEFAULT_REGION ?= ap-southeast-2
 AWS_VAULT_PROFILE ?= kb-superuser
-TF_PROJECT ?= examples
-TIMEOUT ?= 3600s
+TF_PROJECT ?=
 
-# Docker will automatically create an empty CACHE_VOLUME the first time it is used.
-CACHE_VOLUME := $(notdir $(PWD))_cache
-CACHE_FLAGS := -v $(CACHE_VOLUME):/go --env GOCACHE=/go/cache --env GO111MODULE=on
-
-SSH_FLAGS = -v ~/.ssh:/root/.ssh
 AWS_VAULT_EXEC = AWS_DEFAULT_REGION=$(AWS_DEFAULT_REGION) aws-vault exec $(AWS_VAULT_PROFILE) --
 
 .PHONY: apply cache clean destroy format init plan pre-commit validate test
@@ -37,7 +31,7 @@ destroy: init
 	$(AWS_VAULT_EXEC) terraform destroy -auto-approve $(TF_PROJECT)
 
 format:
-	$(DOCKER_RUN) terraform fmt && terraform fmt $(TF_PROJECT)
+	terraform fmt && terraform fmt $(TF_PROJECT)
 
 init: .terraform
 
@@ -47,4 +41,4 @@ terraform.tfplan: .terraform main.tf variables.tf $(TF_PROJECT)
 	$(AWS_VAULT_EXEC) terraform plan -out $@ $(TF_PROJECT)
 
 validate: init
-	$(DOCKER_RUN) terraform validate $(TF_PROJECT)
+	terraform validate $(TF_PROJECT)
