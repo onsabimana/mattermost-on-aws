@@ -44,7 +44,7 @@ module mattermost {
   public_subnet_ids  = "${module.vpc.public_subnet_ids}"
 
   # safe internet browsing
-  certificate_arn = "${aws_acm_certificate_validation.star.certificate_arn}"
+  certificate_arn = ""
 
 
   # db
